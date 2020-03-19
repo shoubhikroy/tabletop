@@ -1,0 +1,10 @@
+# Routes
++ bypassAuth
+GET    /                           controllers.Landing.healthCheck(request: Request)
+->     /v1/accounts                topics.accounts.Routes
+
+# Map static resources from the /public folder to the /assets URL path
++ bypassAuth
+GET     /favicon.ico    controllers.Assets.at(path="/public/images", file="favicon.png")
+
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

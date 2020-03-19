@@ -1,0 +1,8 @@
++ bypassAuth
+POST    /register        controllers.service.Accounts.register(request: Request)
++ bypassAuth
+POST    /registerAdmin   controllers.service.Accounts.registerAdmin(request: Request)
++ bypassAuth
+POST    /login           controllers.service.Accounts.login(request: Request)
++ bypassAuth
+POST   /                 controllers.service.Accounts.logout(request: Request)
