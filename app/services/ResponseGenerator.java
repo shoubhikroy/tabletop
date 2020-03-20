@@ -19,7 +19,7 @@ import static play.mvc.Results.internalServerError;
 public class ResponseGenerator {
     public static Result generatedResponse(RequestResource request, String status, String message, String _resultType) {
         if (request == null)
-            request = new RequestResource<>("not_supplied", "error", "");
+            request = new RequestResource<>("not_supplied", "error", null);
         if (status == null)
             status = "error";
         if (message == null)
@@ -39,7 +39,7 @@ public class ResponseGenerator {
             return (Result) method.invoke(null, node.toPrettyString());
         } catch (Exception e) {
             Logger.error("error", e);
-            return internalServerError(message);
+            return internalServerError(e.toString());
         }
     }
 

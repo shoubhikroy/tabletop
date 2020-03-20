@@ -1,9 +1,19 @@
 package models.accounts;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Registration {
     private String username;
     private String password;
     private String email;
+
+    public Registration(@JsonProperty(value = "username", required = true)  String username,
+                        @JsonProperty(value = "password", required = true) String password,
+                        @JsonProperty(value = "email", required = true) String email) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+    }
 
     public String getUsername() {
         return username;

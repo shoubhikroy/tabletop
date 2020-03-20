@@ -1,6 +1,8 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 //client sends hash (optional) and payload
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,7 +25,10 @@ public class RequestResource<T> {
                 '}';
     }
 
-    public RequestResource(String hash, String endpoint, T payload) {
+    @JsonCreator
+    public RequestResource(@JsonProperty("hash") String hash,
+                           @JsonProperty("endpoint") String endpoint,
+                           @JsonProperty(value = "payload", required = true) T payload) {
         this.hash = hash;
         this.endpoint = endpoint;
         this.payload = payload;
