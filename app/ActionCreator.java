@@ -1,21 +1,17 @@
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.RequestResource;
-import models.accounts.Registration;
 import play.Logger;
 import play.libs.Json;
-import play.libs.typedmap.TypedMap;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
-import services.ResponseGenerator;
+import handlers.ResponseHandler;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -26,7 +22,7 @@ import static jwt.filter.JwtFilter.HEADER_AUTHORIZATION;
 
 public class ActionCreator implements play.http.ActionCreator {
 
-    static ResponseGenerator rg;
+    static ResponseHandler rg;
 
     @Override
     public Action createAction(Http.Request request, Method actionMethod) {

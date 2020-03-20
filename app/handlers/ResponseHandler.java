@@ -1,4 +1,4 @@
-package services;
+package handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -8,7 +8,6 @@ import models.ResponseResource;
 import play.Logger;
 import play.mvc.Results;
 import play.mvc.Result;
-import play.mvc.StatusHeader;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -16,7 +15,7 @@ import java.util.List;
 
 import static play.mvc.Results.internalServerError;
 
-public class ResponseGenerator {
+public class ResponseHandler {
     public static Result generatedResponse(RequestResource request, String status, String message, String _resultType) {
         if (request == null)
             request = new RequestResource<>("not_supplied", "error", null);

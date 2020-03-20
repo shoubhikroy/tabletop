@@ -2,14 +2,24 @@ package models.accounts;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Registration {
+public class RegistrationInfo {
     private String username;
     private String password;
+
+    @Override
+    public String toString() {
+        return "RegistrationInfo{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
+
     private String email;
 
-    public Registration(@JsonProperty(value = "username", required = true)  String username,
-                        @JsonProperty(value = "password", required = true) String password,
-                        @JsonProperty(value = "email", required = true) String email) {
+    public RegistrationInfo(@JsonProperty(value = "username", required = true)  String username,
+                            @JsonProperty(value = "password", required = true) String password,
+                            @JsonProperty(value = "email", required = true) String email) {
         this.username = username;
         this.password = password;
         this.email = email;
@@ -33,15 +43,6 @@ public class Registration {
 
     public String getEmail() {
         return email;
-    }
-
-    @Override
-    public String toString() {
-        return "Registration{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                '}';
     }
 
     public void setEmail(String email) {
