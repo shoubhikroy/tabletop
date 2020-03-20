@@ -37,18 +37,17 @@ public class Accounts extends Controller {
 
     public CompletionStage<Result> register(final Http.Request request) {
         Logger.info("Registering user...");
-        Object body = request.body();
-        Logger.info(request.body().asJson().toPrettyString());
-//
+
         try {
             RequestResource<Registration> resource = Json.fromJson(request.body().asJson(), RequestResource.class);
+            Logger.info(resource.toString());
             return supplyAsync(() -> {
                 return ok("register " + resource.toString() + " " + request.toString());
             }, ec.current());
         } catch (Error e) {
             return CompletableFuture.completedFuture(forbidden("Error"));
         }
-        //User user = formFactory.form(User.class).bindFromRequest(request).get();
+//      User user = formFactory.form(User.class).bindFromRequest(request).get();
 //
 //        return userRepository
 //                .create(user)

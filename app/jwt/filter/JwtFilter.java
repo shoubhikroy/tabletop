@@ -19,7 +19,7 @@ import play.routing.Router;
 import static play.mvc.Results.forbidden;
 
 public class JwtFilter extends Filter {
-    private static final String HEADER_AUTHORIZATION = "Authorization";
+    public static final String HEADER_AUTHORIZATION = "Authorization";
     private static final String BEARER = "Bearer ";
     private static final String ROUTE_MODIFIER_BYPASS_AUTH = "bypassAuth";
     private static final String ERR_AUTHORIZATION_HEADER = "ERR_AUTHORIZATION_HEADER";
@@ -59,7 +59,6 @@ public class JwtFilter extends Filter {
         }
 
         Logger.info("JWT Authorization Succeeded: " + requestHeader.toString());
-        Logger.info("request user:  " + requestHeader.remoteAddress());
         return nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get())));
     }
 }
