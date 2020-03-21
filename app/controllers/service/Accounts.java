@@ -1,5 +1,6 @@
 package controllers.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import handlers.AccountHandler;
 import models.RequestResource;
@@ -35,25 +36,10 @@ public class Accounts extends Controller {
         this.formFactory = formFactory;
     }
 
-    public CompletionStage<Result> register(final Http.Request request) {
+    public CompletionStage<Result> register(final Http.Request request) throws JsonProcessingException {
         JavaType javaType = Json.mapper().getTypeFactory().constructParametricType(RequestResource.class, RegistrationInfo.class);
-        RequestResource<RegistrationInfo> resource = null;
-        RegistrationInfo registrationInfo;
-
-        //validation
-        try {
-            resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
-        } catch (Exception e) {
-            Logger.error(e.toString());
-            Result rr = rg.generatedResponse(resource, "error parsing payload", e.getMessage(), "internalServerError");
-            return CompletableFuture.completedFuture(rr);
-        }
-
-        registrationInfo = resource.getPayload();
-        return accountHandler.register(registrationInfo).thenApplyAsync(posts -> {
-            final List<PostResource> postList = posts.collect(Collectors.toList());
-            return ok(Json.toJson(postList));
-        }, ec.current());
+        RequestResource<RegistrationInfo> resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
+        return accountHandler.register(resource).thenApplyAsync(response -> response, ec.current());
     }
 
     public CompletionStage<Result> registerAdmin(final Http.Request request) {

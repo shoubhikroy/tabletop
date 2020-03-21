@@ -10,6 +10,10 @@ public class ResponseResource<T> {
     private ErrorResource errors;
     private T payload;
 
+    public ResponseResource() {
+
+    }
+
     @Override
     public String toString() {
         return "ResponseResource{" +

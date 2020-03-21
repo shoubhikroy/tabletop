@@ -1,6 +1,5 @@
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import models.RequestResource;
 import play.Logger;
@@ -36,14 +35,14 @@ public class ActionCreator implements play.http.ActionCreator {
                 } catch (Exception e) {
                     Logger.error(e.toString());
                     resource = new RequestResource<>("not_supplied", req.uri(), null);
-                    Result rr = rg.generatedResponse(resource, "Looks like empty or bad data", e.getMessage(), "badRequest");
+                    Result rr = rg.generatedErrorResponse(resource, "Looks like empty or bad data", e.getMessage(), "badRequest");
                     return CompletableFuture.completedFuture(rr);
                 }
                 // common payload errors:
                 if (null == resource ||
                     null == resource.getPayload()) {
-                    resource = new RequestResource<>("not_supplied3", req.uri(), null);
-                    Result rr = rg.generatedResponse(resource, "error", "Looks like empty data or missing payload", "badRequest");
+                    resource = new RequestResource<>("not_supplied", req.uri(), null);
+                    Result rr = rg.generatedErrorResponse(resource, "error", "Looks like empty data or missing payload", "badRequest");
                     return CompletableFuture.completedFuture(rr);
                 }
 
@@ -62,8 +61,7 @@ public class ActionCreator implements play.http.ActionCreator {
                     resource.setIpAddress(ipAddress);
                     resource.setEndpoint(req.uri());
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode body = mapper.convertValue(resource, JsonNode.class);
+                    JsonNode body = Json.mapper().convertValue(resource, JsonNode.class);
                     JsonNode payload = request.body().asJson().get("payload");
                     ((ObjectNode)body).put("payload", payload);
                     Logger.info("Entering method: " + req.uri());
@@ -71,9 +69,9 @@ public class ActionCreator implements play.http.ActionCreator {
                     return delegate.call(req.withBody(new Http.RequestBody(body)));
                 } catch (Exception e) {
                     Logger.error(e.toString());
-                    Result rr = rg.generatedResponse(resource,
-                            "error pre_parsing request",
-                            e.toString(),
+                    Result rr = rg.generatedErrorResponse(resource,
+                            "Error processing request",
+                            e.getMessage(),
                             "internalServerError");
                     return CompletableFuture.completedFuture(rr);
                 }

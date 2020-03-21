@@ -1,11 +1,11 @@
 package handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import models.ErrorResource;
 import models.RequestResource;
 import models.ResponseResource;
 import play.Logger;
+import play.libs.Json;
 import play.mvc.Results;
 import play.mvc.Result;
 
@@ -16,7 +16,7 @@ import java.util.List;
 import static play.mvc.Results.internalServerError;
 
 public class ResponseHandler {
-    public static Result generatedResponse(RequestResource request, String status, String message, String _resultType) {
+    public static Result generatedErrorResponse(RequestResource request, String status, String message, String _resultType) {
         if (request == null)
             request = new RequestResource<>("not_supplied", "error", null);
         if (status == null)
@@ -26,29 +26,42 @@ public class ResponseHandler {
         if (_resultType == null)
             _resultType = "badRequest";
 
-        Method method;
         ArrayList<String> errors = new ArrayList<String>();
         errors.add(message);
         ErrorResource er = new ErrorResource(errors);
+
+        return createNoPayloadResponse(request, status, er, _resultType);
+    }
+
+    public static Result generatedPayloadResponse(RequestResource request, String status, Object payload, String _resultType) {
+
+        return null;
+    }
+
+    public static Result generatedErrorResponse(RequestResource request, String status, List<String> errors, String _resultType) {
+        if (request == null)
+            request = new RequestResource<>("not_supplied", "error", null);
+        if (status == null)
+            status = "error";
+        if (errors == null)
+            errors = new ArrayList<String>();
+        if (_resultType == null)
+            _resultType = "badRequest";
+
+        ErrorResource er = new ErrorResource((ArrayList<String>) errors);
+        return createNoPayloadResponse(request, status, er, _resultType);
+    }
+
+    private static Result createNoPayloadResponse(RequestResource request, String status, ErrorResource er, String _resultType) {
+        Method method;
         try {
             ResponseResource rr = new ResponseResource(request.getHash(), request.getEndpoint(), status, er, null);
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.convertValue(rr, JsonNode.class);
+            JsonNode node = Json.mapper().convertValue(rr, JsonNode.class);
             method = Results.class.getMethod(_resultType, String.class);
             return (Result) method.invoke(null, node.toPrettyString());
         } catch (Exception e) {
             Logger.error("error", e);
             return internalServerError(e.toString());
         }
-    }
-
-    public Result generatedResponse(RequestResource request, String status, Object payload, String _resultType) {
-
-        return null;
-    }
-
-    public Result generatedResponse(RequestResource request, String status, List<String> errors, String _resultType) {
-
-        return null;
     }
 }

@@ -22,7 +22,6 @@ public class User extends Controller {
 
     private final FormFactory formFactory;
 
-    @Inject
     public User(HttpExecutionContext ec, UserRepository userRepository, FormFactory formFactory) {
         this.ec = ec;
         this.userRepository = userRepository;

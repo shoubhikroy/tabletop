@@ -1,18 +1,91 @@
 package dbobjects;
 
+import play.Logger;
+import play.db.jpa.JPAApi;
+
+import javax.inject.Inject;
+import javax.persistence.EntityExistsException;
+import javax.persistence.EntityManager;
+import java.text.MessageFormat;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
-public interface DBObjectRepository<T> {
+import static java.util.concurrent.CompletableFuture.supplyAsync;
 
-    CompletionStage<Stream<T>> list();
+public abstract class DBObjectRepository<T extends DBOject> {
 
-    CompletionStage<Optional<T>> create(T postData);
+    private final JPAApi jpaApi;
+    private final DatabaseExecutionContext executionContext;
+    final Class<T> typeParamClass;
 
-    CompletionStage<Optional<T>> get(Long id);
+    public DBObjectRepository(JPAApi jpaApi, DatabaseExecutionContext executionContext, Class<T> typeParamClass) {
+        this.jpaApi = jpaApi;
+        this.executionContext = executionContext;
+        this.typeParamClass = typeParamClass;
+    }
 
-    CompletionStage<Optional<T>> update(Long id, T object);
 
-    CompletionStage<Optional<T>> delete(Long id, T object);
+    public CompletionStage<Optional<T>> create(T object) {
+        return supplyAsync(() -> wrap(em -> insert(em, object)), executionContext);
+    }
+
+    public CompletionStage<Stream<T>> list() {
+        return supplyAsync(() -> wrap(em -> list(em)), executionContext);
+    }
+
+    public CompletionStage<Optional<T>> get(Long id) {
+        return supplyAsync(() -> wrap(em -> get(em, id)), executionContext);
+    }
+
+    public CompletionStage<Optional<T>> update(T object) {
+        return supplyAsync(() -> wrap(em -> update(em, object)), executionContext);
+    }
+
+    public CompletionStage<Optional<T>> delete(T object) {
+        return supplyAsync(() -> wrap(em -> {
+                return delete(em, object);
+        }), executionContext);
+    }
+
+    private Optional<T> delete(EntityManager em, T object) {
+        object.setDeleted(true);
+        try {
+            em.merge(object);
+        } catch (EntityExistsException e) {
+            Logger.error("TEASLDJNAS:LDKASJDL:KASJD:ASLKDJAS:LKDJAS:LDKJ");
+        }
+
+        return Optional.ofNullable(object);
+    }
+
+    private <T> T wrap(Function<EntityManager, T> function) {
+        return jpaApi.withTransaction(function);
+    }
+
+    private Optional<T> insert(EntityManager em, T object) {
+        em.persist(object);
+        return Optional.ofNullable(object);
+    }
+
+    private Optional<T> update(EntityManager em, T object) {
+        em.merge(object);
+        return Optional.ofNullable(object);
+    }
+
+    private Optional<T> get(EntityManager em, Long objectId) {
+        T object = em.find(typeParamClass, Long.valueOf(objectId));
+        if (object != null) {
+            em.detach(object);
+        }
+        return Optional.ofNullable(object);
+    }
+
+    private Stream<T> list(EntityManager em) {
+        List<T> objects = em.createQuery(MessageFormat.format("select u from {0} u", typeParamClass.getSimpleName()), typeParamClass).getResultList();
+        return objects.stream();
+    }
+
 }

@@ -28,4 +28,15 @@ public class DBOject {
     @CreationTimestamp
     @Column
     private Timestamp createdDate;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    @Column(name = "deleted", nullable = false)
+    private boolean deleted = false;
 }

@@ -10,11 +10,11 @@ import javax.persistence.Table;
 @Entity
 public class User extends DBOject {
 
-    @Column(name = "username", nullable = false)
+    @Column(name = "username", unique = true, nullable = false)
     private String username;
     @Column(name = "password", nullable = false)
     private String password;
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "type", nullable = false)
     private int type;
