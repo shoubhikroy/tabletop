@@ -1,4 +1,4 @@
-package filters;
+package interceptors.headers;
 
 import java.util.List;
 import java.util.Map;

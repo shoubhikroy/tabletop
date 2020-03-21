@@ -19,6 +19,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
+import static play.mvc.Results.ok;
 
 public class AccountHandler {
     private final UserRepository repository;
@@ -42,9 +43,21 @@ public class AccountHandler {
 
         errors.add("Testing");
         return repository.create(user).thenApplyAsync(_user -> {
-            Logger.error("GOT THIS FAR");
+
             Result rr = rg.generatedErrorResponse(request, "error", errors, "badRequest");
             return rr;
         }, ec.current());
+    }
+
+    public CompletionStage<Result> list(RequestResource<RegistrationInfo> request) {
+        User user = new User();
+        user.setUsername(request.getPayload().getUsername());
+        user.setEmail(request.getPayload().getEmail());
+        user.setPassword(request.getPayload().getPassword());
+        return repository.list()
+            .thenApplyAsync(userStream -> ok(toJson(userStream.collect(Collectors.toList()))), ec.current());
+//            Result rr = rg.generatedErrorResponse(request, "error", errors, "badRequest");
+//            return rr;
+//        }, ec.current());
     }
 }

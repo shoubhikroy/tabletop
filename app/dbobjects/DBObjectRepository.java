@@ -1,14 +1,18 @@
 package dbobjects;
 
+import org.hibernate.exception.ConstraintViolationException;
 import play.Logger;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.EntityExistsException;
 import javax.persistence.EntityManager;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -52,12 +56,7 @@ public abstract class DBObjectRepository<T extends DBOject> {
 
     private Optional<T> delete(EntityManager em, T object) {
         object.setDeleted(true);
-        try {
-            em.merge(object);
-        } catch (EntityExistsException e) {
-            Logger.error("TEASLDJNAS:LDKASJDL:KASJD:ASLKDJAS:LKDJAS:LDKJ");
-        }
-
+        em.merge(object);
         return Optional.ofNullable(object);
     }
 
@@ -84,7 +83,7 @@ public abstract class DBObjectRepository<T extends DBOject> {
     }
 
     private Stream<T> list(EntityManager em) {
-        List<T> objects = em.createQuery(MessageFormat.format("select u from {0} u", typeParamClass.getSimpleName()), typeParamClass).getResultList();
+        List<T> objects = em.createQuery(MessageFormat.format("select u from {0} u WHERE u.deleted = true", typeParamClass.getSimpleName()), typeParamClass).getResultList();
         return objects.stream();
     }
 

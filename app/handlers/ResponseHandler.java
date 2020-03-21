@@ -1,7 +1,6 @@
 package handlers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import models.ErrorResource;
 import models.RequestResource;
 import models.ResponseResource;
 import play.Logger;
@@ -28,9 +27,8 @@ public class ResponseHandler {
 
         ArrayList<String> errors = new ArrayList<String>();
         errors.add(message);
-        ErrorResource er = new ErrorResource(errors);
 
-        return createNoPayloadResponse(request, status, er, _resultType);
+        return createNoPayloadResponse(request, status, errors, _resultType);
     }
 
     public static Result generatedPayloadResponse(RequestResource request, String status, Object payload, String _resultType) {
@@ -48,11 +46,10 @@ public class ResponseHandler {
         if (_resultType == null)
             _resultType = "badRequest";
 
-        ErrorResource er = new ErrorResource((ArrayList<String>) errors);
-        return createNoPayloadResponse(request, status, er, _resultType);
+        return createNoPayloadResponse(request, status, errors, _resultType);
     }
 
-    private static Result createNoPayloadResponse(RequestResource request, String status, ErrorResource er, String _resultType) {
+    private static Result createNoPayloadResponse(RequestResource request, String status, List<String> er, String _resultType) {
         Method method;
         try {
             ResponseResource rr = new ResponseResource(request.getHash(), request.getEndpoint(), status, er, null);

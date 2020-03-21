@@ -4,9 +4,12 @@ import dbobjects.DBOject;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
-@Table(name = "users")
+@Table(name = "users", indexes = {
+        @Index(columnList = "id", name = "id"),
+        @Index(columnList = "username", name = "username")})
 @Entity
 public class User extends DBOject {
 

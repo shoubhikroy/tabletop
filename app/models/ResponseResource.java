@@ -2,12 +2,23 @@ package models;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.List;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResponseResource<T> {
     private String hash;
     private String endpoint;
     private String status;
-    private ErrorResource errors;
+
+    public List<String> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
+    }
+
+    private List<String> errors;
     private T payload;
 
     public ResponseResource() {
@@ -25,7 +36,7 @@ public class ResponseResource<T> {
                 '}';
     }
 
-    public ResponseResource(String hash, String endpoint, String status, ErrorResource errors, T payload) {
+    public ResponseResource(String hash, String endpoint, String status, List<String> errors, T payload) {
         this.hash = hash;
         this.endpoint = endpoint;
         this.status = status;
@@ -55,14 +66,6 @@ public class ResponseResource<T> {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public ErrorResource getErrors() {
-        return errors;
-    }
-
-    public void setErrors(ErrorResource errors) {
-        this.errors = errors;
     }
 
     public T getPayload() {

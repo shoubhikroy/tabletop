@@ -1,5 +1,5 @@
 
-import filters.LoggingFilter;
+import interceptors.headers.LoggingFilter;
 import jwt.filter.JwtFilter;
 import play.Environment;
 import play.api.http.EnabledFilters;

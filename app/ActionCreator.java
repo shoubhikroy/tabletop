@@ -9,6 +9,8 @@ import play.mvc.Http;
 import play.mvc.Result;
 import handlers.ResponseHandler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -46,6 +48,7 @@ public class ActionCreator implements play.http.ActionCreator {
                     return CompletableFuture.completedFuture(rr);
                 }
 
+                JsonNode body = null;
                 // massage payload
                 try {
                     Http.Headers _headers = req.getHeaders();
@@ -61,12 +64,10 @@ public class ActionCreator implements play.http.ActionCreator {
                     resource.setIpAddress(ipAddress);
                     resource.setEndpoint(req.uri());
 
-                    JsonNode body = Json.mapper().convertValue(resource, JsonNode.class);
+                    body = Json.mapper().convertValue(resource, JsonNode.class);
                     JsonNode payload = request.body().asJson().get("payload");
                     ((ObjectNode)body).put("payload", payload);
                     Logger.info("Entering method: " + req.uri());
-
-                    return delegate.call(req.withBody(new Http.RequestBody(body)));
                 } catch (Exception e) {
                     Logger.error(e.toString());
                     Result rr = rg.generatedErrorResponse(resource,
@@ -75,6 +76,27 @@ public class ActionCreator implements play.http.ActionCreator {
                             "internalServerError");
                     return CompletableFuture.completedFuture(rr);
                 }
+                RequestResource<Object> finalResource = resource;
+                return delegate.call(req.withBody(new Http.RequestBody(body))).exceptionally(throwable -> {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    throwable.printStackTrace(pw);
+                    String sStackTrace = sw.toString();
+                    Logger.error(sStackTrace);
+
+                    String msg = throwable.getMessage();
+                    while (null != throwable.getCause()) {
+                        Throwable _throwable = throwable.getCause();
+                        if (_throwable.getClass().toString().contains(".exceptions.jdbc4.")) {
+                            msg = _throwable.getMessage();
+                            break;
+                        }
+                        throwable = throwable.getCause();
+                    }
+
+                    Result rr = rg.generatedErrorResponse(finalResource, msg, sStackTrace, "internalServerError");
+                    return rr;
+                });
             }
         };
     }
