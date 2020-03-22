@@ -17,6 +17,9 @@ public class DBOject {
     public Long getId() {
         return id;
     }
+    public String getIdString() {
+        return String.valueOf(id);
+    }
     public void setId(Long id) {
         this.id = id;
     }

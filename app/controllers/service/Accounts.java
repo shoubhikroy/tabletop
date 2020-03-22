@@ -2,15 +2,15 @@ package controllers.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import handlers.AccountHandler;
-import play.Logger;
 import play.data.FormFactory;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.*;
-import handlers.ResponseHandler;
+import handlers.ResourceHandler;
 
 import javax.inject.Inject;
 import java.util.concurrent.CompletionStage;
 
+import static handlers.AccountHandler.*;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class Accounts extends Controller {
@@ -20,7 +20,7 @@ public class Accounts extends Controller {
 
     private final FormFactory formFactory;
 
-    static ResponseHandler rg;
+    static ResourceHandler rg;
 
     @Inject
     public Accounts(HttpExecutionContext ec, AccountHandler accountHandler, FormFactory formFactory) {
@@ -29,31 +29,25 @@ public class Accounts extends Controller {
         this.formFactory = formFactory;
     }
 
+    //Parameters: username, password, email
+    //Returns:    user
     public CompletionStage<Result> register(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.register(request).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.register(request, USER).thenApplyAsync(response -> response, ec.current());
     }
 
-    public CompletionStage<Result> registerAdmin(final Http.Request request) {
-        Logger.info(request.toString());
-
-        return supplyAsync(() -> {
-            return ok(request.toString());
-        }, ec.current());
+    //Parameters: username, password, email
+    //Returns:    user
+    public CompletionStage<Result> registerAdmin(final Http.Request request) throws JsonProcessingException {
+        return accountHandler.register(request, ADMIN).thenApplyAsync(response -> response, ec.current());
     }
 
-    public CompletionStage<Result> login(final Http.Request request) {
-        Logger.info(request.toString());
-
-        return supplyAsync(() -> {
-            return ok(request.toString());
-        }, ec.current());
+    //Parameters: username, password
+    //Returns:    token
+    public CompletionStage<Result> login(final Http.Request request) throws JsonProcessingException {
+        return accountHandler.login(request).thenApplyAsync(response -> response, ec.current());
     }
 
     public CompletionStage<Result> logout(final Http.Request request) {
-        Logger.info(request.toString());
-
-        return supplyAsync(() -> {
-            return ok(request.toString());
-        }, ec.current());
+        return accountHandler.logout(request).thenApplyAsync(response -> response, ec.current());
     }
 }

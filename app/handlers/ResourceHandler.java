@@ -14,7 +14,7 @@ import java.util.List;
 
 import static play.mvc.Results.internalServerError;
 
-public class ResponseHandler {
+public class ResourceHandler {
     public static Result generateResponse(RequestResource request, String status, String message, String _resultType) {
         if (request == null)
             request = new RequestResource<>("not_supplied", "error", null);

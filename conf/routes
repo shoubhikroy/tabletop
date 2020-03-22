@@ -1,4 +1,6 @@
 # Routes
+# bypassAuth, bypassClientKey, adminOnly
+
 + bypassAuth
 + bypassClientKey
 GET    /                           controllers.Landing.healthCheck(request: Request)

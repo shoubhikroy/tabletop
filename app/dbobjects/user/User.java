@@ -34,10 +34,6 @@ public class User extends DBOject {
                 '}';
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(String password) {
         this.password = UserRepository.createPassword(password);
     }
@@ -72,5 +68,9 @@ public class User extends DBOject {
 
     public void setRoles(int roles) {
         this.roles = roles;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

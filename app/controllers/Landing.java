@@ -38,13 +38,13 @@ public class Landing extends Controller {
     @Inject
     private Config config;
 
-    @Inject
-    @NamedCache("games")
-    private AsyncCacheApi gameCache;
-
-    @Inject
-    @NamedCache("local")
-    private AsyncCacheApi localCache;
+//    @Inject
+//    @NamedCache("games")
+//    private AsyncCacheApi gameCache;
+//
+//    @Inject
+//    @NamedCache("local")
+//    private AsyncCacheApi localCache;
 
     @Inject
     private HttpExecutionContext ec;

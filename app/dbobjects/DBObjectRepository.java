@@ -60,7 +60,7 @@ public abstract class DBObjectRepository<T extends DBOject> {
         return Optional.ofNullable(object);
     }
 
-    private <T> T wrap(Function<EntityManager, T> function) {
+    protected <T> T wrap(Function<EntityManager, T> function) {
         return jpaApi.withTransaction(function);
     }
 

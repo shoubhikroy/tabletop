@@ -8,7 +8,7 @@ import play.libs.Json;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
-import handlers.ResponseHandler;
+import handlers.ResourceHandler;
 
 import java.util.List;
 import java.util.Map;
@@ -22,7 +22,7 @@ import static jwt.filter.JwtFilter.HEADER_AUTHORIZATION;
 
 public class ActionCreator implements play.http.ActionCreator {
 
-    static ResponseHandler rg;
+    static ResourceHandler rg;
 
     @Override
     public Action createAction(Http.Request request, Method actionMethod) {
@@ -35,8 +35,7 @@ public class ActionCreator implements play.http.ActionCreator {
                 resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
             } catch (Exception e) {
                 resource = new RequestResource<>("not_supplied", req.uri(), null);
-                Result rr = rg.generateResponse(resource, "Request Body Error", "Looks like empty or bad data", "badRequest");
-                return CompletableFuture.completedFuture(rr);
+                return CompletableFuture.completedFuture(ExceptionHandler.baseErrors(e, resource));
             }
             // common payload errors:
             if (null == resource ||

@@ -8,7 +8,7 @@ import java.io.StringWriter;
 
 public class ExceptionHandler {
 
-    static ResponseHandler rg;
+    static ResourceHandler rg;
 
     public static Result baseErrors(Throwable throwable, RequestResource<Object> finalResource){
         StringWriter sw = new StringWriter();

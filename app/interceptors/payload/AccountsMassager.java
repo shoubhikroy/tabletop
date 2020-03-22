@@ -3,7 +3,7 @@ package interceptors.payload;
 import models.RequestResource;
 import play.Logger;
 import play.mvc.*;
-import handlers.ResponseHandler;
+import handlers.ResourceHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,7 +13,7 @@ import java.util.concurrent.CompletionStage;
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
 public class AccountsMassager extends Action.Simple {
-    static ResponseHandler rg;
+    static ResourceHandler rg;
 
     public CompletionStage<Result> call(Http.Request req) {
         Logger.info("1Calling action for {}", req);
