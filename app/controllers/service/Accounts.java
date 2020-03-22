@@ -29,25 +29,31 @@ public class Accounts extends Controller {
         this.formFactory = formFactory;
     }
 
+    //POST
     //Parameters: username, password, email
     //Returns:    user
     public CompletionStage<Result> register(final Http.Request request) throws JsonProcessingException {
         return accountHandler.register(request, USER).thenApplyAsync(response -> response, ec.current());
     }
 
+    //POST
     //Parameters: username, password, email
     //Returns:    user
     public CompletionStage<Result> registerAdmin(final Http.Request request) throws JsonProcessingException {
         return accountHandler.register(request, ADMIN).thenApplyAsync(response -> response, ec.current());
     }
 
+    //POST
     //Parameters: username, password
     //Returns:    token
     public CompletionStage<Result> login(final Http.Request request) throws JsonProcessingException {
         return accountHandler.login(request).thenApplyAsync(response -> response, ec.current());
     }
 
-    public CompletionStage<Result> logout(final Http.Request request) {
-        return accountHandler.logout(request).thenApplyAsync(response -> response, ec.current());
+    //POST
+    //Parameters: username, password
+    //Returns:    token
+    public CompletionStage<Result> getUser(final Http.Request request) throws JsonProcessingException {
+        return accountHandler.get(request).thenApplyAsync(response -> response, ec.current());
     }
 }

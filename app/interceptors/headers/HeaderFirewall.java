@@ -1,5 +1,6 @@
 package interceptors.headers;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -10,12 +11,14 @@ import akka.stream.Materializer;
 import play.Logger;
 import play.api.Configuration;
 import play.mvc.*;
+import play.routing.HandlerDef;
+import play.routing.Router;
 
 import static play.mvc.Results.badRequest;
 import static play.mvc.Results.forbidden;
 
 public class HeaderFirewall extends Filter {
-    private static final String ERR_AUTHORIZATION_HEADER = "ERROR: Wrong content-type, required application/json.";
+    private static final String ERR_AUTHORIZATION_HEADER = "ERROR: Wrong content-type, required application/json for non GET calls.";
     Configuration config;
 
     @Inject
@@ -27,8 +30,8 @@ public class HeaderFirewall extends Filter {
     @Override
     public CompletionStage<Result> apply(Function<Http.RequestHeader, CompletionStage<Result>> nextFilter, Http.RequestHeader requestHeader) {
         Optional<String> authHeader =  requestHeader.getHeaders().get("Content-Type");
-
-        if (!authHeader.filter(ah -> ah.contains("application/json")).isPresent()) {
+        //if not GET and not json, return forbidden
+        if (!requestHeader.method().equals("GET") && !authHeader.filter(ah -> ah.contains("application/json")).isPresent()) {
             Logger.error("ERROR: Wrong content-type");
             return CompletableFuture.completedFuture(badRequest(ERR_AUTHORIZATION_HEADER));
         }

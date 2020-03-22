@@ -7,6 +7,7 @@ import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Optional;
@@ -28,13 +29,6 @@ public class UserRepository extends DBObjectRepository<User> {
         this.executionContext = executionContext;
     }
 
-    private Optional<User> findByName(EntityManager em, String username) {
-        User u = em.createQuery(
-                "SELECT u from User u WHERE u.username = :username", User.class).
-                setParameter("username", username).getSingleResult();
-        return Optional.ofNullable(u);
-    }
-
     static String createPassword(String clearString) {
         return BCrypt.hashpw(clearString, BCrypt.gensalt());
     }
@@ -49,13 +43,30 @@ public class UserRepository extends DBObjectRepository<User> {
         return BCrypt.checkpw(candidate, encryptedPassword);
     }
 
+    private Optional<User> findByName(EntityManager em, String username) {
+        try {
+            User u = em.createQuery(
+                    "SELECT u from User u WHERE u.username = :username", User.class).
+                    setParameter("username", username).getSingleResult();
+            return Optional.ofNullable(u);
+        } catch (NoResultException e) {
+            return Optional.ofNullable(null);
+        }
+    }
+
+    public CompletionStage<Optional<User>> findByName(String username) {
+        return supplyAsync(() -> wrap(em -> findByName(em, username)), executionContext);
+    }
+
     public CompletionStage<Optional<User>> checkUserPass(String username, String password) {
         return supplyAsync(() -> {
             Optional<User> u = wrap(em -> findByName(em, username));
-            User _u =  u.get();
-            String encPass = _u.getPassword();
-            if(checkPassword(password, encPass)) return u;
-            else return Optional.ofNullable(null);
+            if (u.isPresent()) {
+                User _u =  u.get();
+                String encPass = _u.getPassword();
+                if(checkPassword(password, encPass)) return u;
+            }
+            return Optional.ofNullable(null);
         }, executionContext);
     }
 }

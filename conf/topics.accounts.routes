@@ -4,4 +4,4 @@ POST    /register        controllers.service.Accounts.register(request: Request)
 POST    /registerAdmin   controllers.service.Accounts.registerAdmin(request: Request)
 + bypassAuth
 POST    /login           controllers.service.Accounts.login(request: Request)
-POST   /                 controllers.service.Accounts.logout(request: Request)
+POST   /                 controllers.service.Accounts.getUser(request: Request)

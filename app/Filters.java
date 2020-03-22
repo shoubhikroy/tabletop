@@ -2,7 +2,7 @@
 import interceptors.headers.HeaderFirewall;
 import interceptors.headers.ClientKeyFilter;
 import interceptors.headers.LoggingFilter;
-import jwt.filter.JwtFilter;
+import interceptors.headers.JwtFilter;
 import play.Environment;
 import play.api.http.EnabledFilters;
 import play.filters.cors.CORSFilter;

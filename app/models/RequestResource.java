@@ -12,6 +12,7 @@ public class RequestResource<T> {
     private String username;
     private String ipAddress;
     private String permissions;
+    private T payload;
 
     @Override
     public String toString() {
@@ -28,7 +29,7 @@ public class RequestResource<T> {
     @JsonCreator
     public RequestResource(@JsonProperty("hash") String hash,
                            @JsonProperty("endpoint") String endpoint,
-                           @JsonProperty(value = "payload", required = true) T payload) {
+                           @JsonProperty(value = "payload") T payload) {
         this.hash = hash;
         this.endpoint = endpoint;
         this.payload = payload;
@@ -57,8 +58,6 @@ public class RequestResource<T> {
     public void setPayload(T payload) {
         this.payload = payload;
     }
-
-    private T payload;
 
     public String getUsername() {
         return username;

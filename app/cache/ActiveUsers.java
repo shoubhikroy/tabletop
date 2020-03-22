@@ -19,6 +19,6 @@ public class ActiveUsers {
     }
 
     public void activateUser(User user) {
-        activeUsers.set(user.getIdString(), user, 60 * 30);
+        activeUsers.set(user.getIdString(), user, 60 * 5);
     }
 }

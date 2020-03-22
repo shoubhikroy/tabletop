@@ -10,6 +10,8 @@ import play.mvc.Http;
 import play.mvc.Result;
 import handlers.ResourceHandler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -18,7 +20,7 @@ import java.util.concurrent.CompletionStage;
 
 import java.lang.reflect.Method;
 
-import static jwt.filter.JwtFilter.HEADER_AUTHORIZATION;
+import static interceptors.headers.JwtFilter.HEADER_AUTHORIZATION;
 
 public class ActionCreator implements play.http.ActionCreator {
 
@@ -26,25 +28,29 @@ public class ActionCreator implements play.http.ActionCreator {
 
     @Override
     public Action createAction(Http.Request request, Method actionMethod) {
+        //deserialize all non GET calls -> they should here to request body structure
+        //creates a request resource object
+        //get calls create empty resource
         return new Action.Simple() {
             @Override
             public CompletionStage<Result> call(Http.Request req) {
             JavaType javaType = Json.mapper().getTypeFactory().constructParametricType(RequestResource.class, Object.class);
-            RequestResource<Object> resource = null;
-            try {
-                resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
-            } catch (Exception e) {
-                resource = new RequestResource<>("not_supplied", req.uri(), null);
-                return CompletableFuture.completedFuture(ExceptionHandler.baseErrors(e, resource));
+            RequestResource<Object> resource = new RequestResource<>("not_supplied_GET_call", req.uri(), null);
+            if (request.hasBody()) {
+                try {
+                    resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
+                } catch (Exception e) {
+                    resource = new RequestResource<>("not_supplied", req.uri(), null);
+                    return CompletableFuture.completedFuture(ExceptionHandler.baseErrors(e, resource));
+                }
+                // common payload errors:
+                if (null == resource ||
+                        null == resource.getPayload()) {
+                    resource = new RequestResource<>("not_supplied", req.uri(), null);
+                    Result rr = rg.generateResponse(resource, "Request Body Error", "Looks like empty data or missing payload", "badRequest");
+                    return CompletableFuture.completedFuture(rr);
+                }
             }
-            // common payload errors:
-            if (null == resource ||
-                null == resource.getPayload()) {
-                resource = new RequestResource<>("not_supplied", req.uri(), null);
-                Result rr = rg.generateResponse(resource, "Request Body Error", "Looks like empty data or missing payload", "badRequest");
-                return CompletableFuture.completedFuture(rr);
-            }
-
             JsonNode body = null;
             // massage payload
             try {
@@ -61,9 +67,11 @@ public class ActionCreator implements play.http.ActionCreator {
                 resource.setIpAddress(ipAddress);
                 resource.setEndpoint(req.uri());
 
-                body = Json.mapper().convertValue(resource, JsonNode.class);
-                JsonNode payload = request.body().asJson().get("payload");
-                ((ObjectNode)body).put("payload", payload);
+                if (request.hasBody()) {
+                    body = Json.mapper().convertValue(resource, JsonNode.class);
+                    JsonNode payload = request.body().asJson().get("payload");
+                    ((ObjectNode)body).put("payload", payload);
+                }
                 Logger.info("Entering method: " + req.uri());
             } catch (Exception e) {
                 Logger.error(e.toString());

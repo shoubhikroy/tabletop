@@ -1,4 +1,4 @@
-package jwt.filter;
+package jwt;
 
 import jwt.VerifiedJwt;
 import play.libs.typedmap.TypedKey;

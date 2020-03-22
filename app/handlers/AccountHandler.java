@@ -88,19 +88,21 @@ public class AccountHandler {
                 return rg.generateResponse(request, "Login Success", result, "ok");
             } else {
                 //if no return error response
-                return rg.generateResponse(request, "Login Failure", _user.get(), "ok");
+                return rg.generateResponse(request, "Login Failure", "Username or Password failure.", "ok");
             }
         }, ec.current());
     }
 
-
-    public CompletionStage<Result> logout(Http.Request _request) {
-      return null;
+    public CompletionStage<Result> get(Http.Request _request) throws JsonProcessingException {
+        RequestResource request = Json.mapper().readValue(_request.body().asJson().toString(), RequestResource.class);
+        String username = request.getUsername();
+        return repository.findByName(username).thenApplyAsync(_user -> {
+            return rg.generateResponse(request, "Success", _user, "ok");
+        }, ec.current());
     }
 
     private String getSignedToken(User user) throws UnsupportedEncodingException {
         String secret = config.getString("play.http.secret.key");
-
         Algorithm algorithm = Algorithm.HMAC256(secret);
         return JWT.create()
                 .withIssuer("tableTop")

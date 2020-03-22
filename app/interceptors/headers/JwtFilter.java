@@ -1,5 +1,5 @@
 
-package jwt.filter;
+package interceptors.headers;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,6 +8,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.function.Function;
 import javax.inject.Inject;
 import akka.stream.Materializer;
+import jwt.Attrs;
 import jwt.JwtValidator;
 import jwt.VerifiedJwt;
 import play.Logger;
@@ -58,7 +59,7 @@ public class JwtFilter extends Filter {
             return CompletableFuture.completedFuture(forbidden(res.left.get().toString()));
         }
 
-        Logger.info("JWT Authorization Succeeded: " + requestHeader.toString());
+        Logger.info("JWT Authorization Succeeded: " + res.right.get());
         return nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get())));
     }
 }
