@@ -30,7 +30,7 @@ public class AccountsMassager extends Action.Simple {
             Logger.error(sStackTrace);
 
             resource = new RequestResource<>("not_supplied", req.uri(), null);
-            Result rr = rg.generatedErrorResponse(resource, "Looks like empty or bad data", e.getMessage(), "badRequest");
+            Result rr = rg.generateResponse(resource, "Looks like empty or bad data", e.getMessage(), "badRequest");
             return CompletableFuture.completedFuture(rr);
         }
         Logger.info("2Calling action for {}", req);

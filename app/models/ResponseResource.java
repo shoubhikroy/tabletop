@@ -10,6 +10,13 @@ public class ResponseResource<T> {
     private String endpoint;
     private String status;
 
+    public ResponseResource(String hash, String endpoint, String status, T payload) {
+        this.hash = hash;
+        this.endpoint = endpoint;
+        this.status = status;
+        this.payload = payload;
+    }
+
     public List<String> getErrors() {
         return errors;
     }

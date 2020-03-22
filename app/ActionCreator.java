@@ -10,8 +10,6 @@ import play.mvc.Http;
 import play.mvc.Result;
 import handlers.ResponseHandler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -37,14 +35,14 @@ public class ActionCreator implements play.http.ActionCreator {
                 resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
             } catch (Exception e) {
                 resource = new RequestResource<>("not_supplied", req.uri(), null);
-                Result rr = rg.generatedErrorResponse(resource, "Request Body Error", "Looks like empty or bad data", "badRequest");
+                Result rr = rg.generateResponse(resource, "Request Body Error", "Looks like empty or bad data", "badRequest");
                 return CompletableFuture.completedFuture(rr);
             }
             // common payload errors:
             if (null == resource ||
                 null == resource.getPayload()) {
                 resource = new RequestResource<>("not_supplied", req.uri(), null);
-                Result rr = rg.generatedErrorResponse(resource, "Request Body Error", "Looks like empty data or missing payload", "badRequest");
+                Result rr = rg.generateResponse(resource, "Request Body Error", "Looks like empty data or missing payload", "badRequest");
                 return CompletableFuture.completedFuture(rr);
             }
 
@@ -70,7 +68,7 @@ public class ActionCreator implements play.http.ActionCreator {
                 Logger.info("Entering method: " + req.uri());
             } catch (Exception e) {
                 Logger.error(e.toString());
-                Result rr = rg.generatedErrorResponse(resource,
+                Result rr = rg.generateResponse(resource,
                         "Error processing request",
                         e.getMessage(),
                         "internalServerError");

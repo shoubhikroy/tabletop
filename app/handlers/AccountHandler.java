@@ -2,12 +2,9 @@ package handlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.mysql.jdbc.log.Log;
 import dbobjects.user.User;
 import dbobjects.user.UserRepository;
 import models.RequestResource;
-import models.ResponseResource;
 import models.accounts.RegistrationInfo;
 import play.Logger;
 import play.libs.Json;
@@ -16,10 +13,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.Optional;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import static play.libs.Json.toJson;
@@ -48,9 +42,8 @@ public class AccountHandler {
         user.setPassword(request.getPayload().getPassword());
 
         return repository.create(user).thenApplyAsync(_user -> {
-
-            Result rr = rg.generatedErrorResponse(request, "error", "errors", "badRequest");
-            return rr;
+            Logger.error(_user.toString());
+            return rg.generateResponse(request, "Success", _user.get(), "ok");
         }, ec.current());
     }
 
