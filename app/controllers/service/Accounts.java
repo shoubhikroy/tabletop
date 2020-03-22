@@ -1,14 +1,9 @@
 package controllers.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import handlers.AccountHandler;
-import interceptors.descriptors.WithErrors;
-import models.RequestResource;
-import models.accounts.RegistrationInfo;
 import play.Logger;
 import play.data.FormFactory;
-import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.*;
 import handlers.ResponseHandler;
@@ -18,7 +13,6 @@ import java.util.concurrent.CompletionStage;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
-@WithErrors
 public class Accounts extends Controller {
     private final HttpExecutionContext ec;
 
@@ -36,9 +30,7 @@ public class Accounts extends Controller {
     }
 
     public CompletionStage<Result> register(final Http.Request request) throws JsonProcessingException {
-        JavaType javaType = Json.mapper().getTypeFactory().constructParametricType(RequestResource.class, RegistrationInfo.class);
-        RequestResource<RegistrationInfo> resource = Json.mapper().readValue(request.body().asJson().toString(), javaType);
-        return accountHandler.list(resource).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.register(request).thenApplyAsync(response -> response, ec.current());
     }
 
     public CompletionStage<Result> registerAdmin(final Http.Request request) {

@@ -1,5 +1,7 @@
 package handlers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mysql.jdbc.log.Log;
 import dbobjects.user.User;
@@ -8,7 +10,9 @@ import models.RequestResource;
 import models.ResponseResource;
 import models.accounts.RegistrationInfo;
 import play.Logger;
+import play.libs.Json;
 import play.libs.concurrent.HttpExecutionContext;
+import play.mvc.Http;
 import play.mvc.Result;
 
 import javax.inject.Inject;
@@ -34,17 +38,18 @@ public class AccountHandler {
         this.ec = ec;
     }
 
-    public CompletionStage<Result> register(RequestResource<RegistrationInfo> request) {
-        ArrayList<String> errors = new ArrayList<String>();
+    public CompletionStage<Result> register(Http.Request _request) throws JsonProcessingException {
+        JavaType javaType = Json.mapper().getTypeFactory().constructParametricType(RequestResource.class, RegistrationInfo.class);
+        RequestResource<RegistrationInfo> request = Json.mapper().readValue(_request.body().asJson().toString(), javaType);
+
         User user = new User();
         user.setUsername(request.getPayload().getUsername());
         user.setEmail(request.getPayload().getEmail());
         user.setPassword(request.getPayload().getPassword());
 
-        errors.add("Testing");
         return repository.create(user).thenApplyAsync(_user -> {
 
-            Result rr = rg.generatedErrorResponse(request, "error", errors, "badRequest");
+            Result rr = rg.generatedErrorResponse(request, "error", "errors", "badRequest");
             return rr;
         }, ec.current());
     }

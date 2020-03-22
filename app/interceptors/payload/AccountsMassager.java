@@ -1,18 +1,10 @@
-package interceptors.body;
+package interceptors.payload;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import handlers.AccountHandler;
 import models.RequestResource;
-import models.accounts.RegistrationInfo;
 import play.Logger;
-import play.data.FormFactory;
-import play.libs.Json;
-import play.libs.concurrent.HttpExecutionContext;
 import play.mvc.*;
 import handlers.ResponseHandler;
 
-import javax.inject.Inject;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.concurrent.CompletableFuture;

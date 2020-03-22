@@ -1,6 +1,6 @@
-package interceptors.descriptors;
+package interceptors.decorators;
 
-import interceptors.body.AccountsMassager;
+import interceptors.payload.AccountsMassager;
 import play.mvc.With;
 
 import java.lang.annotation.ElementType;

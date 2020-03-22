@@ -1,5 +1,6 @@
 # Routes
 + bypassAuth
++ bypassClientKey
 GET    /                           controllers.Landing.healthCheck(request: Request)
 ->     /v1/accounts                topics.accounts.Routes
 
