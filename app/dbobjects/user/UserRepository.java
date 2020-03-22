@@ -3,6 +3,7 @@ package dbobjects.user;
 import dbobjects.DBObjectRepository;
 import dbobjects.DatabaseExecutionContext;
 import org.mindrot.jbcrypt.BCrypt;
+import play.Logger;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -50,6 +51,7 @@ public class UserRepository extends DBObjectRepository<User> {
                     setParameter("username", username).getSingleResult();
             return Optional.ofNullable(u);
         } catch (NoResultException e) {
+            Logger.error("NotFound");
             return Optional.ofNullable(null);
         }
     }

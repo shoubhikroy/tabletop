@@ -9,7 +9,15 @@ public class VerifiedJwtImpl implements VerifiedJwt {
     private String header;
     private String payload;
     private String issuer;
-    private Long userId;
+    private String username;
+
+    @Override
+    public String getUserId() {
+        return userId;
+    }
+
+    private String userId;
+    private Integer roles;
     private Date expiresAt;
 
     public VerifiedJwtImpl(DecodedJWT decodedJWT) {
@@ -17,7 +25,9 @@ public class VerifiedJwtImpl implements VerifiedJwt {
         this.payload = decodedJWT.getPayload();
         this.issuer = decodedJWT.getIssuer();
         this.expiresAt = decodedJWT.getExpiresAt();
-        this.userId = decodedJWT.getClaim("user_id").asLong();
+        this.username = decodedJWT.getClaim("username").asString();
+        this.roles = decodedJWT.getClaim("roles").asInt();
+        this.userId = decodedJWT.getClaim("userId").asString();
     }
 
     @Override
@@ -42,5 +52,15 @@ public class VerifiedJwtImpl implements VerifiedJwt {
     @Override
     public String toString() {
         return Json.toJson(this).toString();
+    }
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+
+    @Override
+    public Integer getRoles() {
+        return roles;
     }
 }

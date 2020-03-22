@@ -11,6 +11,7 @@ import play.mvc.Result;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static play.mvc.Results.internalServerError;
 
@@ -32,6 +33,12 @@ public class ResourceHandler {
     }
 
     public static Result generateResponse(RequestResource request, String status, Object payload, String _resultType) {
+        if (payload == null || (payload instanceof Optional && ((Optional) payload).isEmpty())) {
+            status = "Error";
+            _resultType = "internalServerError";
+        } else if ((payload instanceof Optional && !((Optional) payload).isEmpty())) {
+            payload = ((Optional) payload).get();
+        }
         return createPayloadResponse(request, status, payload, _resultType);
     }
 

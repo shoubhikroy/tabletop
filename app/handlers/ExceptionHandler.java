@@ -17,6 +17,7 @@ public class ExceptionHandler {
         String sStackTrace = sw.toString();
 
         String msg = throwable.getMessage();
+        msg = msg == null ? throwable.toString() : msg;
         Throwable _throwable = throwable;
         while (null != _throwable) {
             if (_throwable.getClass().toString().contains(".exceptions.jdbc4.")) {

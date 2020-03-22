@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import javax.inject.Inject;
 import akka.stream.Materializer;
+import cache.ActiveUsers;
+import dbobjects.user.UserRepository;
 import jwt.Attrs;
 import jwt.JwtValidator;
 import jwt.VerifiedJwt;
@@ -25,11 +28,15 @@ public class JwtFilter extends Filter {
     private static final String ROUTE_MODIFIER_BYPASS_AUTH = "bypassAuth";
     private static final String ERR_AUTHORIZATION_HEADER = "ERR_AUTHORIZATION_HEADER";
     private JwtValidator jwtValidator;
+    private final ActiveUsers activeUsers;
+    private final UserRepository userRepository;
 
     @Inject
-    public JwtFilter(Materializer mat, JwtValidator jwtValidator) {
+    public JwtFilter(Materializer mat, JwtValidator jwtValidator, ActiveUsers activeUsers, UserRepository userRepository) {
         super(mat);
         this.jwtValidator = jwtValidator;
+        this.activeUsers = activeUsers;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -60,6 +67,7 @@ public class JwtFilter extends Filter {
         }
 
         Logger.info("JWT Authorization Succeeded: " + res.right.get());
+        activeUsers.activate(res.right.get().getUserId()).toCompletableFuture();
         return nextFilter.apply(requestHeader.withAttrs(requestHeader.attrs().put(Attrs.VERIFIED_JWT, res.right.get())));
     }
 }

@@ -10,9 +10,6 @@ public class RequestResource<T> {
     private String hash;
     private String endpoint;
     private String username;
-    private String ipAddress;
-    private String permissions;
-    private T payload;
 
     @Override
     public String toString() {
@@ -20,11 +17,36 @@ public class RequestResource<T> {
                 "hash='" + hash + '\'' +
                 ", endpoint='" + endpoint + '\'' +
                 ", username='" + username + '\'' +
+                ", userId='" + userId + '\'' +
+                ", roles=" + roles +
                 ", ipAddress='" + ipAddress + '\'' +
                 ", permissions='" + permissions + '\'' +
                 ", payload=" + payload +
                 '}';
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    private String userId;
+
+    public Integer getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Integer roles) {
+        this.roles = roles;
+    }
+
+    private Integer roles;
+    private String ipAddress;
+    private String permissions;
+    private T payload;
 
     @JsonCreator
     public RequestResource(@JsonProperty("hash") String hash,

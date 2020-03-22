@@ -54,6 +54,6 @@ public class Accounts extends Controller {
     //Parameters: username, password
     //Returns:    token
     public CompletionStage<Result> getUser(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.get(request).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.getUser(request).thenApplyAsync(response -> response, ec.current());
     }
 }

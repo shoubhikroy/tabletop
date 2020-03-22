@@ -2,6 +2,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import handlers.ExceptionHandler;
+import jwt.Attrs;
 import models.RequestResource;
 import play.Logger;
 import play.libs.Json;
@@ -31,6 +32,7 @@ public class ActionCreator implements play.http.ActionCreator {
         //deserialize all non GET calls -> they should here to request body structure
         //creates a request resource object
         //get calls create empty resource
+        Logger.info("Entered ActionCreator");
         return new Action.Simple() {
             @Override
             public CompletionStage<Result> call(Http.Request req) {
@@ -54,21 +56,25 @@ public class ActionCreator implements play.http.ActionCreator {
             JsonNode body = null;
             // massage payload
             try {
-                Http.Headers _headers = req.getHeaders();
-                Map<String, List<String>> headers = _headers.asMap();
-
-                List<String> authHeader =  headers.get(HEADER_AUTHORIZATION);
-
-                String username = "no+user";
+                String username = "no+token";
+                Integer roles = 0;
+                String userId = "no+token";
                 String ipAddress = req.remoteAddress();
+
+                if (request.attrs().containsKey(Attrs.VERIFIED_JWT)) {
+                    username = String.valueOf(request.attrs().get(Attrs.VERIFIED_JWT).getUsername());
+                    roles = Integer.valueOf(request.attrs().get(Attrs.VERIFIED_JWT).getRoles());
+                    userId = String.valueOf(request.attrs().get(Attrs.VERIFIED_JWT).getUserId());
+                }
 
                 if (null == resource.getHash() || resource.getHash().isEmpty()) resource.setHash(UUID.randomUUID().toString());
                 resource.setUsername(username);
+                resource.setRoles(roles);
+                resource.setUserId(userId.toString());
                 resource.setIpAddress(ipAddress);
                 resource.setEndpoint(req.uri());
-
+                body = Json.mapper().convertValue(resource, JsonNode.class);
                 if (request.hasBody()) {
-                    body = Json.mapper().convertValue(resource, JsonNode.class);
                     JsonNode payload = request.body().asJson().get("payload");
                     ((ObjectNode)body).put("payload", payload);
                 }

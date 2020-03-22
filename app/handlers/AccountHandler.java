@@ -59,7 +59,7 @@ public class AccountHandler {
         user.setType(type);
 
         return repository.create(user).thenApplyAsync(_user -> {
-            return rg.generateResponse(request, "Success", _user.get(), "ok");
+            return rg.generateResponse(request, "Success", _user, "ok");
         }, ec.current());
     }
 
@@ -74,7 +74,7 @@ public class AccountHandler {
             //check if login was a success
             if (_user.isPresent()) {
                 //if yes add to cache
-                activeUsers.activateUser(_user.get());
+                activeUsers.activate(_user.get().getIdString()).toCompletableFuture();
                 //generate and return token
                 ObjectNode result = Json.newObject();
                 try {
@@ -93,7 +93,7 @@ public class AccountHandler {
         }, ec.current());
     }
 
-    public CompletionStage<Result> get(Http.Request _request) throws JsonProcessingException {
+    public CompletionStage<Result> getUser(Http.Request _request) throws JsonProcessingException {
         RequestResource request = Json.mapper().readValue(_request.body().asJson().toString(), RequestResource.class);
         String username = request.getUsername();
         return repository.findByName(username).thenApplyAsync(_user -> {
@@ -107,6 +107,7 @@ public class AccountHandler {
         return JWT.create()
                 .withIssuer("tableTop")
                 .withClaim("username", user.getUsername())
+                .withClaim("userId", user.getIdString())
                 .withClaim("roles", user.getRoles())
                 .withExpiresAt(Date.from(ZonedDateTime.now(ZoneId.systemDefault()).plusMinutes(720).toInstant()))
                 .sign(algorithm);
