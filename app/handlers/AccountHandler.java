@@ -23,7 +23,10 @@ import java.io.UnsupportedEncodingException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CompletionStage;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static play.mvc.Results.ok;
 
@@ -98,6 +101,13 @@ public class AccountHandler {
         String username = request.getUsername();
         return repository.findByName(username).thenApplyAsync(_user -> {
             return rg.generateResponse(request, "Success", _user, "ok");
+        }, ec.current());
+    }
+
+    public CompletionStage<Result> getActiveUsers(Http.Request _request) throws JsonProcessingException {
+        RequestResource request = Json.mapper().readValue(_request.body().asJson().toString(), RequestResource.class);
+        return activeUsers.getActiveUsers().thenApplyAsync(users -> {
+            return rg.generateResponse(request, "Success", (Object) users, "ok");
         }, ec.current());
     }
 

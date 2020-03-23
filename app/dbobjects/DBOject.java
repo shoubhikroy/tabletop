@@ -1,5 +1,6 @@
 package dbobjects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -17,6 +18,7 @@ public class DBOject {
     public Long getId() {
         return id;
     }
+    @JsonIgnore
     public String getIdString() {
         return String.valueOf(id);
     }
@@ -26,6 +28,7 @@ public class DBOject {
 
     @UpdateTimestamp
     @Column
+    @JsonIgnore
     private Timestamp modifiedDate;
 
     @CreationTimestamp
@@ -40,6 +43,7 @@ public class DBOject {
         this.deleted = deleted;
     }
 
+    @JsonIgnore
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 }

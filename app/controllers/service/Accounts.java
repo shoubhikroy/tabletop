@@ -33,27 +33,32 @@ public class Accounts extends Controller {
     //Parameters: username, password, email
     //Returns:    user
     public CompletionStage<Result> register(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.register(request, USER).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.register(request, USER);
     }
 
     //POST
     //Parameters: username, password, email
     //Returns:    user
     public CompletionStage<Result> registerAdmin(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.register(request, ADMIN).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.register(request, ADMIN);
     }
 
     //POST
     //Parameters: username, password
     //Returns:    token
     public CompletionStage<Result> login(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.login(request).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.login(request);
     }
 
-    //POST
-    //Parameters: username, password
-    //Returns:    token
+    //GET
+    //Returns:    current user details
     public CompletionStage<Result> getUser(final Http.Request request) throws JsonProcessingException {
-        return accountHandler.getUser(request).thenApplyAsync(response -> response, ec.current());
+        return accountHandler.getUser(request);
+    }
+
+    //GET
+    //Returns:    token
+    public CompletionStage<Result> getActiveUsers(final Http.Request request) throws JsonProcessingException {
+        return accountHandler.getActiveUsers(request);
     }
 }

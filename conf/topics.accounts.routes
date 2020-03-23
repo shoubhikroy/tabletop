@@ -5,3 +5,4 @@ POST    /registerAdmin   controllers.service.Accounts.registerAdmin(request: Req
 + bypassAuth
 POST    /login           controllers.service.Accounts.login(request: Request)
 GET     /getUser         controllers.service.Accounts.getUser(request: Request)
+GET     /getActiveUsers         controllers.service.Accounts.getActiveUsers(request: Request)

@@ -1,5 +1,6 @@
 package dbobjects.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import dbobjects.DBOject;
 
 import javax.persistence.Column;
@@ -16,12 +17,15 @@ public class User extends DBOject {
     @Column(name = "username", unique = true, nullable = false)
     private String username;
     @Column(name = "password", nullable = false)
+    @JsonIgnore
     private String password;
     @Column(name = "email", unique = true, nullable = false)
     private String email;
     @Column(name = "type", nullable = false)
+    @JsonIgnore
     private int type;
     @Column(name = "roles", nullable = false)
+    @JsonIgnore
     private int roles;
 
     @Override

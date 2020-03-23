@@ -6,11 +6,15 @@ import dbobjects.user.UserRepository;
 import play.Logger;
 import play.cache.NamedCache;
 import play.cache.redis.AsyncCacheApi;
+import scala.Option;
 
 import javax.inject.Inject;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.CompletableFuture.supplyAsync;
 
@@ -29,22 +33,16 @@ public class ActiveUsers {
         this.executionContext = executionContext;
     }
 
-    public Boolean activate(User user) {
-        Logger.info("adding user to cache: " + user.getUsername());
-        activeUsers.set(user.getIdString(), user, 60 * 1);
-        return true;
-    }
-
     public CompletionStage<Boolean> activate(String userId) {
         return activeUsers.get(userId).thenApplyAsync(_fromCache -> {
             if (_fromCache.isPresent()) {
-                activeUsers.set(userId, _fromCache.get(), 60 * 1).thenApplyAsync((done) -> {
+                activeUsers.set("user." + userId, _fromCache.get(), 60 * 5).thenApplyAsync((done) -> {
                     Logger.info("readding user to cache: " + userId);
                     return true;
                 });
             } else {
                 userRepository.get(Long.valueOf(userId)).thenApplyAsync(user -> {
-                    if (user.isPresent()) activeUsers.set(userId, user.get(), 60 * 1).thenApplyAsync((done) -> {
+                    if (user.isPresent()) activeUsers.set("user." + userId, user.get(), 60 * 5).thenApplyAsync((done) -> {
                         Logger.info("adding user to cache: " + userId);
                         return true;
                     });
@@ -53,5 +51,15 @@ public class ActiveUsers {
             }
             return false;
         }, executionContext);
+    }
+
+    public CompletionStage<List<Optional<User>>> getActiveUsers() {
+        return getActiveUsersKeys().thenApplyAsync(_users -> {
+                return activeUsers.getAll(User.class, _users).toCompletableFuture().join();
+        }, executionContext);
+    }
+
+    public CompletionStage<List<String>> getActiveUsersKeys() {
+        return activeUsers.matching("user*").thenApplyAsync(users -> users, executionContext);
     }
 }
